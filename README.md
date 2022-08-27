@@ -13,4 +13,12 @@ The source data resides in Azure Data Lake and needs to be processed in a NYC da
 
 ![alt text](https://github.com/Muhammed-Firoz/ADFNYCPAYROLL/blob/main/db-schemaproj5.jpeg?raw=true)
 
+From the Udacity Nanodegree program
+
+
+
+###Parameters
+
+A pipeline parameter of integer type isused to take custom values for the fiscal year thisvalue is then passed to a data flow level parameter in filter activity.
+
 
