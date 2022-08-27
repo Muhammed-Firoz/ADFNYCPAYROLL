@@ -11,4 +11,6 @@ You have been hired as a Data Engineer to create high-quality data pipelines tha
 
 The source data resides in Azure Data Lake and needs to be processed in a NYC data warehouse in Azure Synapse Analytics. The source datasets consist of CSV files with Employee master data and monthly payroll data entered by various City agencies.
 
-![alt text](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+![alt text](https://github.com/Muhammed-Firoz/ADFNYCPAYROLL/blob/main/db-schemaproj5.jpeg?raw=true)
+
+
