@@ -1,0 +1,52 @@
+{
+	"name": "Totalpayrolldatapipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "totalpayrolldataflow",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "dataflowtotalpayroll",
+						"type": "DataFlowReference",
+						"parameters": {
+							"dataflow_param_fiscalyear": {
+								"value": "@pipeline().parameters.pipe_param_fiscalyr",
+								"type": "Expression"
+							}
+						}
+					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "AzureDataLakeStorage1",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "adlsnycpayrollfirozaa/dirstaging"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"pipe_param_fiscalyr": {
+				"type": "int"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-08-27T16:57:16Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

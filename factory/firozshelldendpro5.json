@@ -1,0 +1,9 @@
+{
+	"name": "firozshelldendpro5",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "28436112-187f-4d54-ba73-c6a0ad2524a2",
+		"tenantId": "224870b2-d801-4fa3-9378-8e2d0bada7ad"
+	}
+}

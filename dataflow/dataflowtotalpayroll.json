@@ -1,0 +1,144 @@
+{
+	"name": "dataflowtotalpayroll",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_NYC_Payroll_Data",
+						"type": "DatasetReference"
+					},
+					"name": "source1SQLDBPayroll"
+				},
+				{
+					"dataset": {
+						"referenceName": "historydata",
+						"type": "DatasetReference"
+					},
+					"name": "source2HistoryPayroll"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "table_synapse_nycpayroll_summary",
+						"type": "DatasetReference"
+					},
+					"name": "sinkPayrollSummary"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumnSource2"
+				},
+				{
+					"name": "PayrollDataunion1"
+				},
+				{
+					"name": "FiscalYearfilter"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     dataflow_param_fiscalyear as integer (2020)",
+				"}",
+				"source(output(",
+				"          FiscalYear as integer,",
+				"          PayrollNumber as integer,",
+				"          AgencyID as string,",
+				"          AgencyName as string,",
+				"          EmployeeID as string,",
+				"          LastName as string,",
+				"          FirstName as string,",
+				"          AgencyStartDate as date,",
+				"          WorkLocationBorough as string,",
+				"          TitleCode as string,",
+				"          TitleDescription as string,",
+				"          LeaveStatusasofJune30 as string,",
+				"          BaseSalary as double,",
+				"          PayBasis as string,",
+				"          RegularHours as double,",
+				"          RegularGrossPaid as double,",
+				"          OTHours as double,",
+				"          TotalOTPaid as double,",
+				"          TotalOtherPay as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1SQLDBPayroll",
+				"source(output(",
+				"          FiscalYear as string,",
+				"          PayrollNumber as string,",
+				"          AgencyID as string,",
+				"          AgencyName as string,",
+				"          EmployeeID as string,",
+				"          LastName as string,",
+				"          FirstName as string,",
+				"          AgencyStartDate as string,",
+				"          WorkLocationBorough as string,",
+				"          TitleCode as string,",
+				"          TitleDescription as string,",
+				"          LeaveStatusasofJune30 as string,",
+				"          BaseSalary as string,",
+				"          PayBasis as string,",
+				"          RegularHours as string,",
+				"          RegularGrossPaid as string,",
+				"          OTHours as string,",
+				"          TotalOTPaid as string,",
+				"          TotalOtherPay as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2HistoryPayroll",
+				"source2HistoryPayroll derive(FiscalYear = toInteger(FiscalYear),",
+				"          PayrollNumber = toInteger(PayrollNumber),",
+				"          AgencyStartDate = toDate(AgencyStartDate, 'mm/dd/yyyy'),",
+				"          BaseSalary = toDouble(BaseSalary),",
+				"          RegularHours = toDouble(RegularHours),",
+				"          RegularGrossPaid = toDouble(RegularGrossPaid),",
+				"          OTHours = toDouble(OTHours),",
+				"          TotalOTPaid = toDouble(TotalOTPaid),",
+				"          TotalOtherPay = toDouble(TotalOtherPay)) ~> derivedColumnSource2",
+				"source1SQLDBPayroll, derivedColumnSource2 union(byName: true)~> PayrollDataunion1",
+				"PayrollDataunion1 filter(toInteger(FiscalYear) >= $dataflow_param_fiscalyear) ~> FiscalYearfilter",
+				"FiscalYearfilter derive(TotalPaid = RegularGrossPaid + TotalOTPaid+TotalOtherPay) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(AgencyName,",
+				"          FiscalYear),",
+				"     NumberofEmployess = count(EmployeeID),",
+				"          MinBasePay = min(BaseSalary),",
+				"          MaxBasePay = max(BaseSalary),",
+				"          AverageBasePay = avg(BaseSalary),",
+				"          AverageOTHours = avg(OTHours),",
+				"          AverageOTPay = round(avg(TotalOTPaid),3),",
+				"          TotalOtherPay = sum(TotalOtherPay),",
+				"          TotalPay = round(sum(TotalPaid),3)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          FiscalYear as integer,",
+				"          AgencyName as string,",
+				"          TotalPaid as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     staged: true,",
+				"     allowCopyCommand: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkPayrollSummary"
+			]
+		}
+	}
+}

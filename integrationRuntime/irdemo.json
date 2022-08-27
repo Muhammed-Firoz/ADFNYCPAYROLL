@@ -1,0 +1,17 @@
+{
+	"name": "irdemo",
+	"properties": {
+		"type": "Managed",
+		"typeProperties": {
+			"computeProperties": {
+				"location": "West US",
+				"dataFlowProperties": {
+					"computeType": "MemoryOptimized",
+					"coreCount": 8,
+					"timeToLive": 10,
+					"cleanup": false
+				}
+			}
+		}
+	}
+}
